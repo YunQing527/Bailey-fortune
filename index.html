@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>小狗贝利玄学馆 - 宠物每日运势</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: linear-gradient(135deg, #f9f3e6 0%, #ffe6f0 100%);
+            font-family: 'Segoe UI', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .brand {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,250,240,0.85);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px 6px 10px;
+            border-radius: 60px;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid rgba(224, 176, 128, 0.3);
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        .brand:active { transform: scale(0.97); }
+        .brand svg {
+            width: 34px;
+            height: 34px;
+            display: block;
+        }
+        .brand span {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #b45f2b;
+            letter-spacing: 0.5px;
+        }
+        .card {
+            max-width: 580px;
+            width: 100%;
+            background: rgba(255,255,250,0.96);
+            border-radius: 48px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.1);
+            padding: 28px 24px 40px;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 1.9rem;
+            margin: 0 0 6px;
+            color: #b95f3b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .sub {
+            color: #8b6b4d;
+            font-size: 0.85rem;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #ffe0c0;
+            display: inline-block;
+            padding-bottom: 6px;
+        }
+        .form-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+        label {
+            font-weight: 600;
+            color: #5e3a2b;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1.5px solid #f0cfb0;
+            border-radius: 60px;
+            font-size: 1rem;
+            background: white;
+            transition: 0.2s;
+            outline: none;
+            font-family: inherit;
+        }
+        input:focus, select:focus {
+            border-color: #b95f3b;
+            box-shadow: 0 0 0 3px rgba(185,95,59,0.2);
+        }
+        button {
+            background: #b95f3b;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 60px;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 12px;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+            font-family: inherit;
+        }
+        button:hover { background: #9b4a2c; transform: scale(0.98); }
+        .result-box {
+            background: #fffaf2;
+            border-radius: 32px;
+            padding: 20px;
+            margin-top: 28px;
+            text-align: left;
+            border: 1px solid #ffe0c0;
+        }
+        .fortune-item {
+            background: white;
+            border-radius: 24px;
+            padding: 12px 18px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+        .locked {
+            filter: blur(5px);
+            pointer-events: none;
+            user-select: none;
+            background: #f6ede4;
+        }
+        .unlock-area {
+            text-align: center;
+            margin: 20px 0 8px;
+        }
+        .btn-donate {
+            background: #f7b05e;
+            color: #4a2a1a;
+            width: auto;
+            display: inline-block;
+            padding: 10px 28px;
+            font-size: 1rem;
+            margin-top: 0;
+            box-shadow: none;
+        }
+        .tip {
+            font-size: 0.75rem;
+            color: #b87a5a;
+            margin-top: 12px;
+        }
+        .footer {
+            margin-top: 28px;
+            font-size: 0.7rem;
+            color: #c9ad93;
+        }
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            z-index: 200;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        @media (max-width: 500px) {
+            .card { padding: 20px 18px 32px; }
+            h1 { font-size: 1.6rem; }
+            .brand span { display: none; }
+            .brand { padding: 5px 10px; }
+            .brand svg { width: 30px; height: 30px; }
+        }
+    </style>
+</head>
+<body>
+<div class="brand" id="baileyBrand">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="48" fill="#FDEBD0" stroke="#E1B07E" stroke-width="1.5"/>
+        <path d="M28 38 Q20 22 30 18 Q36 16 34 30" fill="#B87C4F" stroke="#9B5E2C" stroke-width="1.2"/>
+        <path d="M72 38 Q80 22 70 18 Q64 16 66 30" fill="#B87C4F" stroke="#9B5E2C" stroke-width="1.2"/>
+        <ellipse cx="50" cy="48" rx="28" ry="24" fill="#D99E5C"/>
+        <circle cx="38" cy="44" r="3.5" fill="#2F221B"/>
+        <circle cx="62" cy="44" r="3.5" fill="#2F221B"/>
+        <circle cx="36.5" cy="42.5" r="1.2" fill="white"/>
+        <circle cx="60.5" cy="42.5" r="1.2" fill="white"/>
+        <ellipse cx="50" cy="56" rx="5" ry="3.5" fill="#4B2E24"/>
+        <path d="M45 60 Q50 65 55 60" stroke="#6B3E2A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M48 63 L48 68 Q50 69 52 68 L52 63 Z" fill="#E8877A"/>
+        <path d="M26 70 Q50 80 74 70" stroke="#5D9BEC" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <circle cx="50" cy="74" r="6" fill="#F7CF45" stroke="#DAA520" stroke-width="1"/>
+        <text x="50" y="78" font-size="8" text-anchor="middle" fill="#8B5A2B" font-weight="bold">B</text>
+    </svg>
+    <span>🐾 小狗贝利 · 玄学馆</span>
+</div>
+
+<div class="card">
+    <h1>🐕 小狗贝利占卜 🔮</h1>
+    <div class="sub">每日一卦 · 毛孩好运</div>
+
+    <div class="form-group">
+        <label>🐾 宠物名字</label>
+        <input type="text" id="petName" placeholder="例如：虎子、咪咪" autocomplete="off">
+    </div>
+    <div class="form-group">
+        <label>🐕 宠物种类</label>
+        <select id="petType">
+            <option value="猫">🐱 猫</option>
+            <option value="狗">🐶 狗</option>
+            <option value="仓鼠">🐹 仓鼠</option>
+            <option value="兔子">🐰 兔子</option>
+            <option value="小鸟">🐦 小鸟</option>
+            <option value="乌龟">🐢 乌龟</option>
+            <option value="蜥蜴/守宫">🦎 蜥蜴/守宫</option>
+            <option value="其他">🦜 其他</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>📅 宠物年龄（可选）</label>
+        <input type="text" id="petAge" placeholder="例如：2岁 / 8个月 / 3天" autocomplete="off">
+    </div>
+    <button id="generateBtn">✨ 查看今日运势 ✨</button>
+
+    <div id="resultArea" class="result-box" style="display: none;">
+        <div style="font-weight: bold; margin-bottom: 12px;">🔮 占卜结果</div>
+        <div id="fortuneContent"></div>
+        <div id="unlockSection" class="unlock-area" style="display: none;">
+            <button id="donateBtn" class="btn-donate">🍗 打赏 1 元，解锁「今日隐藏运势」 🍗</button>
+            <div class="tip">✨ 解锁后包含：宠物的秘密心愿 + 今天最该避免的事 + 一个让你微笑的预言 ✨</div>
+        </div>
+    </div>
+    <div class="footer">✨ 玄学趣味 · 仅供娱乐 ✨</div>
+</div>
+<script>
+    // ================= 配置区 =================
+    const MIANBAODUO_URL = "https://mianbaoduo.com/o/你的商品ID";
+    // =========================================
+
+    const generateBtn = document.getElementById('generateBtn');
+    const petNameInput = document.getElementById('petName');
+    const petTypeSelect = document.getElementById('petType');
+    const petAgeInput = document.getElementById('petAge');
+    const resultArea = document.getElementById('resultArea');
+    const fortuneContent = document.getElementById('fortuneContent');
+    const unlockSection = document.getElementById('unlockSection');
+
+    let currentFullFortune = null;
+    let isUnlocked = false;
+    let plasticBagUnlocked = false;
+    let clickCount = 0;
+
+    function getTodayDate() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function getCacheKey(name, type, age) {
+        if (type === "塑料袋") return `fortune_plastic_${type}_${age}_${getTodayDate()}`;
+        return `fortune_${name}_${type}_${age}_${getTodayDate()}`;
+    }
+    function showToast(msg, duration = 2000) {
+        let toast = document.querySelector('.toast-msg');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast-msg';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = msg;
+        toast.style.opacity = '1';
+        setTimeout(() => { toast.style.opacity = '0'; }, duration);
+    }
+    function addPlasticBagOptionIfNeeded() {
+        if (plasticBagUnlocked && !document.querySelector('#petType option[value="塑料袋"]')) {
+            const option = document.createElement('option');
+            option.value = "塑料袋";
+            option.textContent = "🛍️ 小狗贝利私藏的沃尔玛塑料袋";
+            petTypeSelect.appendChild(option);
+        }
+    }
+    function loadUnlockStatus() {
+        if (localStorage.getItem('bailey_plastic_unlocked') === 'true') {
+            plasticBagUnlocked = true;
+            addPlasticBagOptionIfNeeded();
+        }
+        if (localStorage.getItem('pet_unlocked') === 'true') isUnlocked = true;
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('unlock') === '1') {
+            localStorage.setItem('pet_unlocked', 'true');
+            isUnlocked = true;
+            const url = new URL(window.location);
+            url.searchParams.delete('unlock');
+            window.history.replaceState({}, document.title, url);
+        }
+        toggleNameInputForPlasticBag();
+    }
+    function setUnlockedPermanently() {
+        localStorage.setItem('pet_unlocked', 'true');
+        isUnlocked = true;
+    }
+    function initEasterEgg() {
+        const brandDiv = document.getElementById('baileyBrand');
+        if (!brandDiv) return;
+        brandDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (plasticBagUnlocked) {
+                showToast("🐶 贝利的塑料袋早已在你的口袋里啦！", 1200);
+                return;
+            }
+            clickCount++;
+            if (clickCount === 3) showToast("🤫 再点2次，发现贝利的小秘密……", 1500);
+            else if (clickCount >= 5 && !plasticBagUnlocked) {
+                plasticBagUnlocked = true;
+                localStorage.setItem('bailey_plastic_unlocked', 'true');
+                addPlasticBagOptionIfNeeded();
+                showToast("✨ 恭喜！你发现了贝利私藏的沃尔玛塑料袋 ✨ 快去给它算一卦！", 2500);
+                clickCount = 0;
+            }
+        });
+    }
+    function toggleNameInputForPlasticBag() {
+        const selected = petTypeSelect.value;
+        if (selected === "塑料袋") {
+            petNameInput.disabled = true;
+            petNameInput.placeholder = "塑料袋不需要名字，贝利会保佑它～";
+            petNameInput.value = "";
+        } else {
+            petNameInput.disabled = false;
+            petNameInput.placeholder = "例如：虎子、咪咪";
+            if (petNameInput.value === "" || petNameInput.value === "贝利的神秘塑料袋") {
+                petNameInput.value = "";
+            }
+        }
+    }
+
+    async function generateFortune(name, type, age) {
+        let actualName = name;
+        let isPlastic = (type === "塑料袋");
+        if (isPlastic) actualName = "plastic_bag_special";
+        const cacheKey = getCacheKey(actualName, type, age);
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) return cached;
+
+        const response = await fetch('/api/fortune', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: actualName, type, age })
+        });
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || '请求失败');
+        }
+        const data = await response.json();
+        const fortune = data.fortune;
+        localStorage.setItem(cacheKey, fortune);
+        return fortune;
+    }
+
+    function displayFortune(fullText) {
+        if (!fullText) return;
+        const lines = fullText.split('\n').filter(l => l.trim().length > 0);
+        const freeLines = lines.slice(0, 3);
+        const paidLines = lines.slice(3);
+        const freeHtml = freeLines.map(l => `<div class="fortune-item">✨ ${l}</div>`).join('');
+        let paidHtml = '';
+        if (paidLines.length > 0) paidHtml = `<div id="paidContent" class="fortune-item" style="background:#fff0e0;">🔮 ${paidLines.join('<br>🔮 ')}</div>`;
+        if (isUnlocked) {
+            fortuneContent.innerHTML = freeHtml + paidHtml;
+            unlockSection.style.display = 'none';
+        } else {
+            fortuneContent.innerHTML = freeHtml + `<div class="fortune-item locked">⭐ 神秘内容·支付1元解锁完整版运势 ⭐</div>`;
+            unlockSection.style.display = 'block';
+        }
+        resultArea.style.display = 'block';
+    }
+
+    generateBtn.addEventListener('click', async () => {
+        let name = petNameInput.value.trim();
+        const type = petTypeSelect.value;
+        const age = petAgeInput.value.trim();
+
+        if (type !== "塑料袋" && !name) {
+            alert("请先输入你家宠物的名字 🐾");
+            return;
+        }
+        if (type === "塑料袋") name = "贝利的神秘塑料袋";
+
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<span class="loading"></span> 占卜中...';
+        try {
+            currentFullFortune = await generateFortune(name, type, age);
+            displayFortune(currentFullFortune);
+        } catch (err) {
+            alert("运势生成出错：" + err.message);
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = '✨ 查看今日运势 ✨';
+        }
+    });
+
+    document.getElementById('donateBtn')?.addEventListener('click', () => {
+        if (!MIANBAODUO_URL || MIANBAODUO_URL.includes("你的商品ID")) {
+            alert("请先配置有效的面包多商品链接");
+            return;
+        }
+        const returnUrl = encodeURIComponent(window.location.href.split('?')[0] + '?unlock=1');
+        let donateUrl = MIANBAODUO_URL;
+        if (donateUrl.includes('?')) donateUrl += `&return_url=${returnUrl}`;
+        else donateUrl += `?return_url=${returnUrl}`;
+        window.location.href = donateUrl;
+    });
+
+    petTypeSelect.addEventListener('change', toggleNameInputForPlasticBag);
+    loadUnlockStatus();
+    initEasterEgg();
+</script>
+</body>
+</html>
