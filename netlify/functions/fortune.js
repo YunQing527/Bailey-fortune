@@ -1,36 +1,40 @@
-export default async function handler(req, context) {
+exports.handler = async (event, context) => {
     // 只允许 POST 请求
-    if (req.method !== 'POST') {
-        return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-            status: 405,
-            headers: { 'Content-Type': 'application/json' }
-        });
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Method not allowed' })
+        };
     }
 
     let body;
     try {
-        body = await req.json();
+        body = JSON.parse(event.body);
     } catch (e) {
-        return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' }
-        });
+        return {
+            statusCode: 400,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Invalid JSON' })
+        };
     }
 
     const { name, type, age } = body;
     if (!name || !type) {
-        return new Response(JSON.stringify({ error: '缺少宠物名字或种类' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' }
-        });
+        return {
+            statusCode: 400,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: '缺少宠物名字或种类' })
+        };
     }
 
     const apiKey = process.env.DEEPSEEK_API_KEY;
     if (!apiKey) {
-        return new Response(JSON.stringify({ error: '服务器未配置 API Key' }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
+        return {
+            statusCode: 500,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: '服务器未配置 API Key' })
+        };
     }
 
     // 构建提示词
@@ -85,15 +89,17 @@ export default async function handler(req, context) {
             throw new Error(data.error?.message || 'API 调用失败');
         }
         const fortune = data.choices[0].message.content;
-        return new Response(JSON.stringify({ fortune }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
-        });
+        return {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fortune })
+        };
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: error.message }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
+        return {
+            statusCode: 500,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: error.message })
+        };
     }
-}      
+};
