@@ -1,20 +1,37 @@
-export default async function handler(req, res) {
-  try {
-    // 检查环境变量
-    const appId = process.env.ALIPAY_SANDBOX_APP_ID;
-    const privateKey = process.env.ALIPAY_SANDBOX_PRIVATE_KEY;
-    const publicKey = process.env.ALIPAY_SANDBOX_PUBLIC_KEY;
-    const gateway = process.env.ALIPAY_GATEWAY;
+import AlipaySDK from 'alipay-sdk';
 
-    res.status(200).json({
-      appIdExists: !!appId,
-      privateKeyExists: !!privateKey,
-      publicKeyExists: !!publicKey,
-      gatewayExists: !!gateway,
-      appIdValue: appId ? '隐藏' : '无',
-      gatewayValue: gateway ? '隐藏' : '无',
+export default async function handler(req, res) {
+  if (req.method !== 'POST' && req.method !== 'GET') {  // 暂时允许 GET 便于测试
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const alipay = new AlipaySDK({
+      appId: process.env.ALIPAY_SANDBOX_APP_ID,
+      privateKey: process.env.ALIPAY_SANDBOX_PRIVATE_KEY,
+      alipayPublicKey: process.env.ALIPAY_SANDBOX_PUBLIC_KEY,
+      gateway: process.env.ALIPAY_GATEWAY,
     });
+
+    const outTradeNo = `ORDER_${Date.now()}`;
+
+    const result = await alipay.pageExec('alipay.trade.page.pay', {
+      bizContent: {
+        out_trade_no: outTradeNo,
+        product_code: 'FAST_INSTANT_TRADE_PAY',
+        total_amount: '0.01',
+        subject: '小狗贝利完整运势解锁',
+      },
+      returnUrl: 'https://xiaogoubailey.top?unlock=1',
+      notifyUrl: 'https://xiaogoubailey.top/api/alipay/notify',
+    });
+
+    // 返回 HTML 表单（自动提交）
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(result);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    // 输出详细错误
+    console.error('支付宝创建订单失败:', err);
+    res.status(500).json({ error: err.message, stack: err.stack });
   }
 }
