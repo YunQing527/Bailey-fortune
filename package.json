@@ -1,0 +1,7 @@
+{
+  "name": "bailey-fortune",
+  "version": "1.0.0",
+  "dependencies": {
+    "alipay-sdk": "^3.0.0"
+  }
+}
