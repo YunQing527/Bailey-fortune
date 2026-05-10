@@ -426,18 +426,14 @@
         }
     });
 
-    document.getElementById('donateBtn')?.addEventListener('click', () => {
-        if (!MIANBAODUO_URL || MIANBAODUO_URL.includes("你的商品ID")) {
-            alert("请先配置有效的面包多商品链接");
-            return;
-        }
-        const returnUrl = encodeURIComponent(window.location.href.split('?')[0] + '?unlock=1');
-        let donateUrl = MIANBAODUO_URL;
-        if (donateUrl.includes('?')) donateUrl += `&return_url=${returnUrl}`;
-        else donateUrl += `?return_url=${returnUrl}`;
-        window.location.href = donateUrl;
-    });
-
+document.getElementById('donateBtn').addEventListener('click', async () => {
+  const response = await fetch('/api/create-order', { method: 'POST' });
+  const html = await response.text();
+  document.open();
+  document.write(html);
+  document.close();
+});
+    
     petTypeSelect.addEventListener('change', toggleNameInputForPlasticBag);
     loadUnlockStatus();
     initEasterEgg();
