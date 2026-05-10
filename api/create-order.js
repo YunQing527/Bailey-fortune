@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     bizContent: {
       out_trade_no: outTradeNo,
       product_code: 'FAST_INSTANT_TRADE_PAY',
-      total_amount: '0.01',
+      total_amount: '1.00',
       subject: '小狗贝利完整运势解锁',
     },
     returnUrl: 'https://xiaogoubailey.top?unlock=1',
